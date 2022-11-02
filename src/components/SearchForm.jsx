@@ -1,48 +1,65 @@
-//import {useForm} from "./FormScript.jsx";
-import { useForm } from "react-hook-form";
+import {useState} from "react";
 
-const Form = () => {
-    const {values, handleChange, handleSubmit} = useForm();
-}
+let todayDate = new Date().toLocaleDateString('es-CL', { year:"numeric", month:"numeric", day:"numeric"})
 
+export function SearchForm(props) {
+    const prueba2 = new Date().toISOString().split('T')[0]
+    const [datos, setDatos] = useState({
+        fechaIda: prueba2,
+        fechaVuelta: prueba2,
+        aeropuertoPartida: '',
+        aeropuertoDestino: ''
+    })
 
-export function SearchForm() {
+    const handleSubmit = (event) => {
+        if (event) event.preventDefault();
+        props.findResultspropname(datos)
+    };
+    const handleInputChange = (event) => {
+        // console.log(event.target.name)
+        // console.log(event.target.value)
+        setDatos({
+            ...datos,
+            [event.target.name] : event.target.value
+        })
+    }
+
     return (
         <>
-            <form onSubmit=${() => console.log(handleSubmit)}>
+            <form onSubmit={handleSubmit}>
                 <label htmlFor="fecha-ida"> </label>
                 <input
                     type="text"
-                    name="fecha-vuelta"
-                    id="fecha-ida"
-                    value={values.fecha-ida}
-                    onChange={handleChange}
+                    name="fechaIda"
+                    id="fechaIda"
+                    value={datos.fechaIda}
+                    onChange={handleInputChange}
                 />
                 <label htmlFor="fecha-vuelta"> </label>
                 <input
                     type="text"
-                    name="fecha-vuelta"
-                    id="fecha-vuelta"
-                    value={values.fecha-vuelta}
-                    onChange={handleChange}
+                    name="fechaVuelta"
+                    id="fechaVuelta"
+                    value={datos.fechaVuelta}
+                    onChange={handleInputChange}
                 />
                 <input
                     type="text"
-                    id="aeropuertoIda"
-                    name="aeropuertoIda"
-                    value={aeropuertoIda}
-                    onChange={handleChange}
+                    id="aeropuertoPartida"
+                    name="aeropuertoPartida"
+                    value={datos.aeropuertoPartida}
+                    onChange={handleInputChange}
                 />
                 <input
                     type="text"
-                    id="aeropuertoVuelta"
-                    name="aeropuertoVuelta"
-                    value={aeropuertoVuelta}
-                    onChange={handleChange}
+                    id="aeropuertoDestino"
+                    name="aeropuertoDestino"
+                    value={datos.aeropuertoDestino}
+                    onChange={handleInputChange}
                 />
                 <input
                     type="submit"
-                    value="Buscar"/>
+                    value="Buscar ✈"/>
             </form>
         </>
     )
