@@ -15,7 +15,6 @@ export function SearchForm(props) {
         new Date().getFullYear()
         + '-' +
         (new Date().getMonth() +1))
-    const currentYear2 = new Date().getFullYear()
     const prueba2 = new Date().toISOString().split('T')[0]
 
     const [datos, setDatos] = useState({
@@ -147,7 +146,7 @@ export function SearchForm(props) {
                                     />
                                 </div>
                             </div>
-                            <div className="p-2 w-3/6">
+                            <div className="p-2 w-3/6 justify-end flex-col flex">
                                 <div className="relative">
                                     <label htmlFor="classes" className={cssLabel}>💺 Clase</label>
                                     <select name="classes"
