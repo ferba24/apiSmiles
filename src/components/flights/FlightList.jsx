@@ -58,7 +58,7 @@ export function FlightList(props) {
                                                 Escalas
                                             </th>
                                             <th scope="col" className="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pr-6">
-                                                Duracion {props.flights.bestPricing.miles}
+                                                Duracion {props.flights.bestPricing.miles}{props.flights.bestPricing.miles}
                                             </th>
                                             <th scope="col" className="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pr-6">
                                                 Asientos

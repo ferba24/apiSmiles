@@ -1,4 +1,5 @@
 import {useState} from "react";
+import {currentDateFormat} from '../../services/GetCurrentDate.js'
 import { ArrowUturnLeftIcon, ArrowLongRightIcon,BeakerIcon } from '@heroicons/react/24/solid'
 
 const cssField = "w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
@@ -9,12 +10,7 @@ const cssInput = "w-full bg-gray-100 bg-opacity-50 rounded border border-gray-30
 const cssButton = "flex mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg"
 
 export function SearchForm(props) {
-    const currentMonth = new Date().getMonth() +1
-    const currentYear = new Date().getFullYear()
-    const currentDateFormat =  (
-        new Date().getFullYear()
-        + '-' +
-        (new Date().getMonth() +1))
+
     const prueba2 = new Date().toISOString().split('T')[0]
 
     const [datos, setDatos] = useState({
@@ -34,10 +30,12 @@ export function SearchForm(props) {
     const handleInputChange = (event) => {
         // console.log(event.target.name)
         // console.log(event.target.value)
-        setDatos({
+        setDatos(
+            {
             ...datos,
             [event.target.name] : event.target.value
-        })
+        }
+        )
     }
 
     return (
@@ -55,6 +53,7 @@ export function SearchForm(props) {
                                         name="fechaIda"
                                         id="fechaIda"
                                         max="2028-01"
+                                        min={currentDateFormat}
                                         className={cssInput}
                                         value={datos.fechaIda}
                                         onChange={handleInputChange}

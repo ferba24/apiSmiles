@@ -9,13 +9,13 @@ export const FlightPage = () => {
     const [error, setError] = useState(null);
 
     const findResultspropvalue = (props) => {
-       // console.log(props)
+        console.log(props)
         GetFlights(props, setError, setIsLoading, setFlights)
     }
 
     return (
         <>
-            <SearchForm findResultspropname={findResultspropvalue} />
+            <SearchForm findResultspropname={findResultspropvalue}/>
             <FlightList flights={flights} error={error} isLoading={isLoading}/>
         </>
     )
