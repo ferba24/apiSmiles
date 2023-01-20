@@ -1,6 +1,5 @@
 import {useState} from "react";
 import {currentDateFormat} from '../../services/GetCurrentDate.js'
-import { ArrowUturnLeftIcon, ArrowLongRightIcon,BeakerIcon } from '@heroicons/react/24/solid'
 
 const cssField = "w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
 const cssLabel = "block text-sm font-medium text-gray-700"
@@ -16,8 +15,8 @@ export function SearchForm(props) {
     const [datos, setDatos] = useState({
         fechaIda: currentDateFormat,
         fechaVuelta: '',
-        aeropuertoPartida: '',
-        aeropuertoDestino: '',
+        aeropuertoPartida: 'EZE',
+        aeropuertoDestino: 'MIA',
         adults: '1',
         kids: '0',
         babies: '0'
@@ -38,8 +37,10 @@ export function SearchForm(props) {
         )
     }
 
+
     return (
         <>
+
             <form onSubmit={handleSubmit}>
                 <div className="container px-2 py-2 mx-auto">
                     <div className="lg:w-1/1 md:w-2/3 mx-auto">
@@ -69,6 +70,7 @@ export function SearchForm(props) {
                                         type="month"
                                         name="fechaVuelta"
                                         id="fechaVuelta"
+                                        min={currentDateFormat}
                                         className={cssField}
                                         onChange={handleInputChange}
                                     />
@@ -76,7 +78,7 @@ export function SearchForm(props) {
                         </div>
                             <div className="p-2 w-1/2">
                                 <div className="relative">
-                                    <label htmlFor="fecha-vuelta" className={cssLabel}>Aeropuerto Partida</label>
+                                    <label htmlFor="aeropuertoPartida" className={cssLabel}>Aeropuerto Partida</label>
                                     <input
                                         type="text"
                                         id="aeropuertoPartida"
@@ -90,7 +92,7 @@ export function SearchForm(props) {
                             </div>
                             <div className="p-2 w-1/2">
                                 <div className="relative">
-                                    <label htmlFor="fecha-vuelta" className={cssLabel}>Aeropuerto Destino</label>
+                                    <label htmlFor="AeropuertoDestino" className={cssLabel}>Aeropuerto Destino</label>
                                     <input
                                         type="text"
                                         id="aeropuertoDestino"
@@ -104,7 +106,7 @@ export function SearchForm(props) {
                             </div>
                             <div className="p-2 w-1/6">
                                 <div className="relative">
-                                    <label htmlFor="fecha-vuelta" className={cssLabel}>🧑 Adultos</label>
+                                    <label htmlFor="Adultos" className={cssLabel}>🧑 Adultos</label>
                                     <input
                                         type="number"
                                         id="adults"
