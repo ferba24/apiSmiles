@@ -21,7 +21,7 @@ export const GetFlights = async (props, setError, setIsLoading, setFlights) => {
             Cabina: '',
             Equipaje: ''
         }
-};
+    };
 
     let mejorOfertaDelDia = 0
 
@@ -31,59 +31,67 @@ export const GetFlights = async (props, setError, setIsLoading, setFlights) => {
 
     //definimos dia actual por si el usuario busca vuelos para este mes asi no buscamos dias anteriores
     const today = new Date().getDate()
-    let initialForCounter = 0
+    let initialDayForCounter
     if (currentDateFormat == `${props.fechaIda}`) {
-        initialForCounter = today
+        initialDayForCounter = (today + 1)
     } else {
-        initialForCounter = 1
+        initialDayForCounter = 0
     }
 
-        for (let i = initialForCounter; i < getDaysInMonth(`${props.fechaIda}`) ; i++) {
+    let promisesArray = []
 
-            const llamadaAPI = `https://api-air-flightsearch-prd.smiles.com.br/v1/airlines/search?adults=${props.adults}&cabinType=all&children=0&currencyCode=ARS&departureDate=${props.fechaIda}-${i}&destinationAirportCode=${props.aeropuertoDestino}&infants=0&isFlexibleDateChecked=false&originAirportCode=${props.aeropuertoPartida}&tripType=2&forceCongener=false&r=ar`
+    for (let i = initialDayForCounter; i <= getDaysInMonth(`${props.fechaIda}`); i++) {
+        promisesArray.push(
+            fetch(
+                `https://api-air-flightsearch-prd.smiles.com.br/v1/airlines/search?adults=${props.adults}&cabinType=all&children=0&currencyCode=ARS&departureDate=${props.fechaIda}-${i}&destinationAirportCode=${props.aeropuertoDestino}&infants=0&isFlexibleDateChecked=false&originAirportCode=${props.aeropuertoPartida}&tripType=2&forceCongener=false&r=ar`, {headers: apiHeaders }
+            )
+        )
+    }
 
-            //vuelos = {...llamadaAPI, fechaFetch: `${props.fechaIda}-${i}`}
-            try {
-                const response = await fetch(llamadaAPI, {headers: apiHeaders });
-                if (response.ok) {
-                    const flights = await response.json();
-                    setFlights(flights.requestedFlightSegmentList[0]);
-                    console.log(flights)
+    try {
+        const response = await Promise.all(promisesArray.flat())
+        response.forEach(response => {
+            console.log(response)
+            if (response.ok) {
+                const flights = response.json();
+                setFlights(flights.requestedFlightSegmentList[0]);
+                console.log(flights)
 
-                    console.log('Fecha del vuelo: ' + props.fechaIda + '-' + i )
+                console.log('Fecha del vuelo: ' + props.fechaIda + '-' + i )
 
-                    //comprobamos que hay oferta para ese dia y la guardamos
-                    if (flights.requestedFlightSegmentList[0].bestPricing.miles)  {
-                        mejorOfertaDelDia = (flights.requestedFlightSegmentList[0].bestPricing.miles)
-                        console.log('Mejor oferta del dia: ' + mejorOfertaDelDia)
-                        mejorOfertaDelDia = 0
-                    }
-
-                    mejoresVuelos[0] = {
-                        vuelo: {
-                            Fecha: flights.flightList[0].departure.date,
-                            Millas: flights.bestPricing.miles,
-                            SmilesandMoney: flights.bestPricing.smilesMoney.miles + '/' + flights.bestPricing.smilesMoney.money,
-                            Aerolinea: flightList[0].airline,
-                            Duracion: flights.flightList[0].duration.hours +':' + flights.flightList[0].duration.minutes,
-                            Escalas: flights.flightList[0].stops,
-                            DuracionEscalas: flights.flightList[0].timeStop.hours + ':' + flights.flightList[12].timeStop.minutes,
-                            Asientos: flights.flightList[0].availableSeats,
-                            Cabina: flights.flightList[0].cabin,
-                            Equipaje: flights.flightList[0].baggage.quantity
-                        }
-                    }
-
-                    console.log({mejoresVuelos})
-                    setError(null);
-                    setIsLoading(false);
-                } else {
-                    setError("Hubo un error ");
+                //comprobamos que hay oferta para ese dia y la guardamos
+                if (flights.requestedFlightSegmentList[0].bestPricing.miles)  {
+                    mejorOfertaDelDia = (flights.requestedFlightSegmentList[0].bestPricing.miles)
+                    console.log('Mejor oferta del dia: ' + mejorOfertaDelDia)
+                    mejorOfertaDelDia = 0
                 }
-            } catch (error) {
-                setError("No pudimos hacer la solicitud para obtener los datos");
-                console.log(error)
+
+                mejoresVuelos[0] = {
+                    vuelo: {
+                        Fecha: flights.flightList[0].departure.date,
+                        Millas: flights.bestPricing.miles,
+                        SmilesandMoney: flights.bestPricing.smilesMoney.miles + '/' + flights.bestPricing.smilesMoney.money,
+                        Aerolinea: flightList[0].airline,
+                        Duracion: flights.flightList[0].duration.hours +':' + flights.flightList[0].duration.minutes,
+                        Escalas: flights.flightList[0].stops,
+                        DuracionEscalas: flights.flightList[0].timeStop.hours + ':' + flights.flightList[12].timeStop.minutes,
+                        Asientos: flights.flightList[0].availableSeats,
+                        Cabina: flights.flightList[0].cabin,
+                        Equipaje: flights.flightList[0].baggage.quantity
+                    }
+                }
+
+                console.log({mejoresVuelos})
+                setError(null);
+                setIsLoading(false);
+            } else {
+                setError("Hubo un error ");
             }
-        }
+        })
+
+    } catch (error) {
+        setError("No pudimos hacer la solicitud para obtener los datos");
+        console.log(error)
+    }
 
 }
