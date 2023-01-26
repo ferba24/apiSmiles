@@ -3,6 +3,7 @@ import {currentDateFormat} from './GetCurrentDate.js'
 import {apiHeaders} from './Headers.js'
 import {getDaysInMonth} from './getDaysInMonth.js'
 
+
 export const GetFlights = async (props, setError, setIsLoading, setFlights) => {
 
 
@@ -49,45 +50,58 @@ export const GetFlights = async (props, setError, setIsLoading, setFlights) => {
     }
 
     try {
-        const response = await Promise.all(promisesArray.flat())
-        response.forEach(response => {
-            console.log(response)
-            if (response.ok) {
-                const flights = response.json();
-                setFlights(flights.requestedFlightSegmentList[0]);
-                console.log(flights)
-
-                console.log('Fecha del vuelo: ' + props.fechaIda + '-' + i )
-
-                //comprobamos que hay oferta para ese dia y la guardamos
-                if (flights.requestedFlightSegmentList[0].bestPricing.miles)  {
-                    mejorOfertaDelDia = (flights.requestedFlightSegmentList[0].bestPricing.miles)
-                    console.log('Mejor oferta del dia: ' + mejorOfertaDelDia)
-                    mejorOfertaDelDia = 0
-                }
-
-                mejoresVuelos[0] = {
-                    vuelo: {
-                        Fecha: flights.flightList[0].departure.date,
-                        Millas: flights.bestPricing.miles,
-                        SmilesandMoney: flights.bestPricing.smilesMoney.miles + '/' + flights.bestPricing.smilesMoney.money,
-                        Aerolinea: flightList[0].airline,
-                        Duracion: flights.flightList[0].duration.hours +':' + flights.flightList[0].duration.minutes,
-                        Escalas: flights.flightList[0].stops,
-                        DuracionEscalas: flights.flightList[0].timeStop.hours + ':' + flights.flightList[12].timeStop.minutes,
-                        Asientos: flights.flightList[0].availableSeats,
-                        Cabina: flights.flightList[0].cabin,
-                        Equipaje: flights.flightList[0].baggage.quantity
-                    }
-                }
-
-                console.log({mejoresVuelos})
-                setError(null);
-                setIsLoading(false);
-            } else {
-                setError("Hubo un error ");
-            }
+        const response = await Promise.allSettled(promisesArray)
+        const jsonResponse = []
+        response.forEach(({value}) => {
+            console.log(value)
+            jsonResponse.push(value.json())
         })
+console.log(jsonResponse)
+        const responseJson = await Promise.allSettled(jsonResponse)
+
+        let flight3 = []
+
+        responseJson.forEach(({value}) => {
+            console.log(value)
+            const shortcutPrefix = value.requestedFlightSegmentList[0]
+            if (shortcutPrefix.bestPricing.miles)  {
+                mejorOfertaDelDia = (value.requestedFlightSegmentList[0].bestPricing.miles)
+                console.log('Mejor oferta del dia: ' + mejorOfertaDelDia)
+                mejorOfertaDelDia = 0
+            }
+
+            mejoresVuelos[0] = {
+                vuelo: {
+                    Fecha: shortcutPrefix.flightList[0].departure.date,
+                    Millas: shortcutPrefix.bestPricing.miles,
+                    SmilesandMoney: shortcutPrefix.bestPricing.smilesMoney.miles + '/' + shortcutPrefix.bestPricing.smilesMoney.money,
+                    Aerolinea: shortcutPrefix.flightList[0].airline.code,
+                    Duracion: shortcutPrefix.flightList[0].duration.hours +':' + shortcutPrefix.flightList[0].duration.minutes,
+                    Escalas: shortcutPrefix.flightList[0].stops,
+                    DuracionEscalas: shortcutPrefix.flightList[0].timeStop.hours + ':' + shortcutPrefix.flightList[0].timeStop.minutes,
+                    Asientos: shortcutPrefix.flightList[0].availableSeats,
+                    Cabina: shortcutPrefix.flightList[0].cabin,
+                    Equipaje: shortcutPrefix.flightList[0].baggage.quantity
+                }
+            }
+            flight3.push({
+                Fecha: shortcutPrefix.flightList[0].departure.date,
+                Millas: shortcutPrefix.bestPricing.miles,
+                SmilesandMoney: shortcutPrefix.bestPricing.smilesMoney.miles + '/' + shortcutPrefix.bestPricing.smilesMoney.money,
+                Aerolinea: shortcutPrefix.flightList[0].airline.code,
+                Duracion: shortcutPrefix.flightList[0].duration.hours +':' + shortcutPrefix.flightList[0].duration.minutes,
+                Escalas: shortcutPrefix.flightList[0].stops,
+                DuracionEscalas: shortcutPrefix.flightList[0].timeStop.hours + ':' + shortcutPrefix.flightList[0].timeStop.minutes,
+                Asientos: shortcutPrefix.flightList[0].availableSeats,
+                Cabina: shortcutPrefix.flightList[0].cabin,
+                Equipaje: shortcutPrefix.flightList[0].baggage.quantity
+            })
+
+
+        })
+        //destructuracion ({value})
+
+        setFlights(flight3)
 
     } catch (error) {
         setError("No pudimos hacer la solicitud para obtener los datos");
