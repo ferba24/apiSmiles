@@ -59,7 +59,7 @@ export const GetFlights = async (props, setError, setIsLoading, setFlights) => {
 console.log(jsonResponse)
         const responseJson = await Promise.allSettled(jsonResponse)
 
-        let flight3 = []
+        let flightsReturned = []
 
         responseJson.forEach(({value}) => {
             console.log(value)
@@ -84,7 +84,7 @@ console.log(jsonResponse)
                     Equipaje: shortcutPrefix.flightList[0].baggage.quantity
                 }
             }
-            flight3.push({
+            flightsReturned.push({
                 Fecha: shortcutPrefix.flightList[0].departure.date,
                 Millas: shortcutPrefix.bestPricing.miles,
                 SmilesandMoney: shortcutPrefix.bestPricing.smilesMoney.miles + '/' + shortcutPrefix.bestPricing.smilesMoney.money,
@@ -101,7 +101,7 @@ console.log(jsonResponse)
         })
         //destructuracion ({value})
 
-        setFlights(flight3)
+        setFlights(flightsReturned)
 
     } catch (error) {
         setError("No pudimos hacer la solicitud para obtener los datos");
