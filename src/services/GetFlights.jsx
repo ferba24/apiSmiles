@@ -2,7 +2,8 @@
 import {currentDateFormat} from './GetCurrentDate.js'
 import {apiHeaders} from './Headers.js'
 import {getDaysInMonth} from './getDaysInMonth.js'
-
+import * as HELPERS from "../helpers"
+import axios from "axios"
 
 export const GetFlights = async (props, setError, setIsLoading, setFlights) => {
 
@@ -39,27 +40,26 @@ export const GetFlights = async (props, setError, setIsLoading, setFlights) => {
         initialDayForCounter = 0
     }
 
-    let promisesArray = []
+    //Lo dejo así de declarativo para que quede mas claro, se puede resolver ambos índices en los argumentos de range
 
-    for (let i = initialDayForCounter; i <= getDaysInMonth(`${props.fechaIda}`); i++) {
-        promisesArray.push(
-            fetch(
+    const dayFrom = initialDayForCounter;
+    const dayTo = getDaysInMonth(`${props.fechaIda}`);
+
+    // Range devuelve un iterador, no un array. Se puede construir en array a partir de él usando el spread operator (como acá),
+    // o usando new Array(range(from, to))
+    const daysToIterate = [...HELPERS.range(dayFrom,dayTo)]
+
+    // Al igual que foreach, map es una función de ejecución asíncrona. 
+    const promisesArray = daysToIterate.map((i) =>{ 
+            return fetch(
                 `https://api-air-flightsearch-prd.smiles.com.br/v1/airlines/search?adults=${props.adults}&cabinType=all&children=0&currencyCode=ARS&departureDate=${props.fechaIda}-${i}&destinationAirportCode=${props.aeropuertoDestino}&infants=0&isFlexibleDateChecked=false&originAirportCode=${props.aeropuertoPartida}&tripType=2&forceCongener=false&r=ar`, {headers: apiHeaders }
-            )
-        )
-    }
+            ).then(res => res.json())
+    })
 
     try {
-        const response = await Promise.allSettled(promisesArray)
-        const jsonResponse = []
-        response.forEach(({value}) => {
-            console.log(value)
-            jsonResponse.push(value.json())
-        })
-console.log(jsonResponse)
-        const responseJson = await Promise.allSettled(jsonResponse)
-
         let flightsReturned = []
+
+        const responseJson = await Promise.allSettled(promisesArray)
 
         responseJson.forEach(({value}) => {
             console.log(value)
@@ -102,10 +102,9 @@ console.log(jsonResponse)
         //destructuracion ({value})
 
         setFlights(flightsReturned)
-
+        
     } catch (error) {
         setError("No pudimos hacer la solicitud para obtener los datos");
         console.log(error)
     }
-
 }
